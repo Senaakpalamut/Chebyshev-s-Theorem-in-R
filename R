@@ -1,0 +1,45 @@
+#Suppose you collect call center wait times from a call center for 24 hours in 
+#a single day. Each hour, the mean and standard deviation of the call wait 
+#times will vary. Assume your call center is huge and you have 10,000 customer 
+#service representatives at any given hour.
+
+#Here are 24 data frames with 10,000 wait times per data frame.
+
+set.seed(1234)
+x<- rpois(24,5) #poisson distribution with parameter 5
+x
+list.df<-lapply(x, function(x) rpois(10000,x))
+str(list.df)
+mean<- sapply(list.df,mean)
+std <- sapply(list.df, sd)
+mean
+std
+
+# Are the observed 95th percentiles consistent with the theoretical relationship
+#between the mean, standard deviation, percentiles? Assuming the sample mean 
+#and sample standard deviation are exactly equal to the population mean and 
+#population standard deviation.
+
+Chebyshev.k<- function(rt_prob=0.05){k=sqrt(1/rt_prob)}
+k<- Chebyshev.k(0.05)
+k
+###########################
+install.packages('chebpol')
+Chebyshev.max<-function(means, stds, rt_probs){
+    k<-Chebyshev.k(rt_probs)
+    theorical.max<-means+k*stds
+    return(theorical.max)
+    }    
+p95.theoretical<-Chebyshev.max(mean.each.hour, sd.each.hour, rt_probs = 0.05)
+p95.theoretical>=p95.each.hour
+##############################
+#Chebyshev's Theorem 3
+#let us use R to gain some intuition for Chebyshev's theorem.
+
+k<- seq(1,4,by=0.1)
+auc<- 1-(1/k^2)
+auc.percent<-round(auc*100)
+cbind(k,auc.percent)
+
+plot(k, auc.percent, col='blue', pch=19, xlab='k', ylab='percent',
+     main='Chebyshev\'s Theorem')
